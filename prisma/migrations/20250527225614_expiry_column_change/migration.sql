@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Polls" ALTER COLUMN "expiry" SET DATA TYPE TEXT;
