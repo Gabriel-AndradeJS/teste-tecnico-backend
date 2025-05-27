@@ -15,8 +15,8 @@ datasource db {
 
 model Polls {
   id        Int      @id @default(autoincrement())
-  question  String
-  expiry    DateTime
+  title     String
+  expiry    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   options   Option[]
@@ -25,11 +25,10 @@ model Polls {
 model Option {
   id        Int      @id @default(autoincrement())
   pollId    Int
-  text      String
+  name      String
   votes     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  poll Polls @relation(fields: [pollId], references: [id])
+  poll Polls @relation(fields: [pollId], references: [id], onDelete: Cascade)
 }
-
