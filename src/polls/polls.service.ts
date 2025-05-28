@@ -15,11 +15,23 @@ export class PollsService {
         });
     }
 
+    async getPollById(id: number) {
+        const poll = await this.prisma.polls.findFirst({
+            where: { id },
+            include: {
+                options: true
+            }
+        })
+
+        return poll;
+    }
+
     async createPoll(dto: CreatePollDto) {
         try {
             const createdPoll = await this.prisma.polls.create({
                 data: {
                     title: dto.title,
+                    category: dto.category,
                     expiry: dto.expiry,
                 }
             });
@@ -27,6 +39,7 @@ export class PollsService {
             await this.prisma.option.createMany({
                 data: dto.options.map(option => ({
                     name: option.name,
+                    votes: option.votes,
                     pollId: createdPoll.id
                 }))
             })
@@ -34,6 +47,53 @@ export class PollsService {
             return createdPoll;
         } catch (error) {
             throw new HttpException('Error creating poll', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async deletePollById(id: number) {
+        try {
+            const poll = await this.prisma.polls.findUnique({
+                where: { id }
+            });
+
+            if (!poll) {
+                throw new HttpException('Enquete não encontrada', HttpStatus.NOT_FOUND);
+            }
+            await this.prisma.polls.delete({
+                where: { id }
+            });
+            return HttpStatus.NO_CONTENT;
+        } catch (error) {
+            throw new HttpException('Erro ao deletar enquete.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async votePoll(id: number, optionId: number) {
+        try {
+            const poll = await this.prisma.polls.findUnique({
+                where: { id }
+            });
+
+            if (!poll) {
+                throw new HttpException('Enquete não encontrada', HttpStatus.NOT_FOUND);
+            }
+
+            const option = await this.prisma.option.findUnique({
+                where: { id: optionId }
+            });
+
+            if (!option) {
+                throw new HttpException('Opção não encontrada', HttpStatus.NOT_FOUND);
+            }
+
+            await this.prisma.option.update({
+                where: { id: optionId },
+                data: { votes: option.votes + 1 }
+            });
+
+            return { message: 'Voto registrado com sucesso' };
+        } catch (error) {
+            throw new HttpException('Erro ao registrar voto', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
