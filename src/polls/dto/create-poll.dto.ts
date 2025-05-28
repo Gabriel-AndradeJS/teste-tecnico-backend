@@ -7,11 +7,16 @@ export class CreatePollDto {
     @IsNotEmpty()
     title: string;
 
+    @IsString()
+    @IsNotEmpty()
+    category: string;
+
     @IsString({ each: true })
     @IsNotEmpty()
     options: CreateOptionDto[];
 
     @IsString()
+    @IsNotEmpty()
     expiry: string;
 
 }
