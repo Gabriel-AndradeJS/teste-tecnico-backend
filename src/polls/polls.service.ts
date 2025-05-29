@@ -96,4 +96,29 @@ export class PollsService {
             throw new HttpException('Erro ao registrar voto', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    async searchPolls(nome?: string, categoria?: string) {
+        const where: any = {};
+
+        if (nome) {
+            where.title = {
+                contains: nome,
+                mode: 'insensitive'
+            };
+        }
+
+        if (categoria) {
+            where.category = {
+                contains: categoria,
+                mode: 'insensitive'
+            };
+        }
+
+        return this.prisma.polls.findMany({
+            where,
+            include: {
+                options: true
+            }
+        });
+    }
 }
