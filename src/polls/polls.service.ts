@@ -100,6 +100,10 @@ export class PollsService {
     async searchPolls(nome?: string, categoria?: string) {
         const where: any = {};
 
+        if (!nome && !categoria) {
+            throw new HttpException('Por favor, forneça pelo menos um critério de pesquisa.', HttpStatus.BAD_REQUEST);
+        }
+
         if (nome) {
             where.title = {
                 contains: nome,
