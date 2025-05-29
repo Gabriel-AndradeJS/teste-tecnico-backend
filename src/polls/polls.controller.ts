@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { PollsService } from './polls.service';
 import { CreatePollDto } from './dto/create-poll.dto';
 
@@ -31,4 +31,10 @@ export class PollsController {
     votePoll(@Param('id', ParseIntPipe) id: number, @Body('optionId', ParseIntPipe) optionId: number) {
         return this.pollsService.votePoll(id, optionId);
     }
+
+    @Post('search')
+    searchPolls(@Query('nome') nome?: string, @Query('categoria') categoria?: string) {
+        return this.pollsService.searchPolls(nome, categoria);
+    }
 }
+
