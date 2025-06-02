@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { PollsService } from './polls.service';
 import { CreatePollDto } from './dto/create-poll.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Controller('polls')
 export class PollsController {
@@ -10,6 +11,11 @@ export class PollsController {
     @Get()
     getAllPolls() {
         return this.pollsService.getAllPolls();
+    }
+
+    @Get('pagination')
+    getPollsPagination(@Query() paginationDto: PaginationDto) {
+        return this.pollsService.getPollsPagination(paginationDto);
     }
 
     @Get(':id')
