@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePollDto } from './dto/create-poll.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class PollsService {
@@ -9,6 +10,25 @@ export class PollsService {
 
     async getAllPolls() {
         return this.prisma.polls.findMany({
+            include: {
+                options: true
+            }
+        });
+    }
+
+    async getPollsPagination(paginationDto: PaginationDto) {
+        const { offset = 0, limit = 2 } = paginationDto;
+
+        if (offset < 0 || limit < 0 || limit > 50) {
+            throw new HttpException('Offset and limit must be non-negative and limit must not exceed 50', HttpStatus.BAD_REQUEST);
+        } 
+
+        return this.prisma.polls.findMany({
+            skip: Number(offset),
+            take: Number(limit),
+            orderBy: {
+                createdAt: 'desc'
+            },
             include: {
                 options: true
             }
